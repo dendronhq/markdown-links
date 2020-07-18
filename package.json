@@ -87,6 +87,8 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@dendronhq/common-all": "^0.3.19",
+    "@dendronhq/engine-server": "^0.3.19",
     "@types/md5": "^2.2.0",
     "md5": "^2.2.1",
     "remark-frontmatter": "^2.0.0",

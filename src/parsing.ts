@@ -6,8 +6,16 @@ import * as wikiLinkPlugin from "remark-wiki-link";
 import * as frontmatter from "remark-frontmatter";
 import { MarkdownNode, Graph } from "./types";
 import { TextDecoder } from "util";
-import { findTitle, findLinks, id, FILE_ID_REGEXP, getFileTypesSetting, getConfiguration } from "./utils";
-import { basename } from "path";
+import {
+  findTitle,
+  findLinks,
+  id,
+  FILE_ID_REGEXP,
+  getFileTypesSetting,
+} from "./utils";
+import { basename, posix } from "path";
+import { DendronEngine } from "@dendronhq/engine-server";
+import { Note, NodeBuilder } from "@dendronhq/common-all";
 
 let idToPath: Record<string, string> = {};
 
@@ -24,6 +32,37 @@ const parser = unified()
   .use(markdown)
   .use(wikiLinkPlugin, { pageResolver: idResolver })
   .use(frontmatter);
+
+export const parseNote = async (graph: Graph, note: Note) => {
+  const index = graph.nodes.findIndex((node) => node.path === note.path);
+  const title = note.title;
+  if (!title) {
+    if (index !== -1) {
+      graph.nodes.splice(index, 1);
+    }
+
+    return;
+  }
+
+  if (index !== -1) {
+    graph.nodes[index].label = title;
+  } else {
+    // TODO: temp
+    const fullPath = posix.join(
+      DendronEngine.getOrCreateEngine().props.root,
+      posix.basename(note.uri.authority)
+    );
+    const node = { id: note.id, path: fullPath, label: title };
+    graph.nodes.push(node);
+  }
+
+  // Remove edges based on an old version of this file.
+  graph.edges = graph.edges.filter((edge) => edge.source !== note.id);
+  note.children.forEach((c) => {
+    let target = c;
+    graph.edges.push({ source: note.id, target: c.id });
+  });
+};
 
 export const parseFile = async (graph: Graph, filePath: string) => {
   const buffer = await vscode.workspace.fs.readFile(vscode.Uri.file(filePath));
@@ -85,6 +124,19 @@ export const learnFileId = async (_graph: Graph, filePath: string) => {
   idToPath[fileNameWithoutExt] = filePath;
 };
 
+export const parseEngine = async (
+  graph: Graph,
+  fileCallback: (graph: Graph, note: Note) => Promise<void>
+) => {
+  const notes = Object.values(DendronEngine.getOrCreateEngine().notes);
+  await Promise.all(
+    notes.map((n) => {
+      return fileCallback(graph, n);
+    })
+  );
+  return;
+};
+
 export const parseDirectory = async (
   graph: Graph,
   directory: string,
@@ -103,8 +155,8 @@ export const parseDirectory = async (
     const isFile = fileType === vscode.FileType.File;
     const hiddenFile = fileName.startsWith(".");
     const isGraphFile = getFileTypesSetting().includes(
-      fileName.substr(fileName.lastIndexOf('.') + 1)
-    )
+      fileName.substr(fileName.lastIndexOf(".") + 1)
+    );
 
     if (isDirectory && !hiddenFile) {
       promises.push(

@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
+import { DendronEngine } from "@dendronhq/engine-server";
 import { TextDecoder } from "util";
 import * as path from "path";
-import { parseFile, parseDirectory, learnFileId } from "./parsing";
+import { parseFile, parseDirectory, learnFileId, parseEngine, parseNote } from "./parsing";
 import { filterNonExistingEdges, getColumnSetting, getConfiguration, getFileTypesSetting } from "./utils";
 import { Graph } from "./types";
 
@@ -129,14 +130,17 @@ export function activate(context: vscode.ExtensionContext) {
         );
         return;
       }
+      const engine = DendronEngine.getOrCreateEngine({ root: vscode.workspace.rootPath});
+      await engine.init();
 
       const graph: Graph = {
         nodes: [],
         edges: [],
       };
 
-      await parseDirectory(graph, vscode.workspace.rootPath, learnFileId);
-      await parseDirectory(graph, vscode.workspace.rootPath, parseFile);
+      // await parseDirectory(graph, vscode.workspace.rootPath, learnFileId);
+      //await parseDirectory(graph, vscode.workspace.rootPath, parseFile);
+      await parseEngine(graph, parseNote);
       filterNonExistingEdges(graph);
 
       const d3Uri = panel.webview.asWebviewUri(
