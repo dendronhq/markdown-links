@@ -1,4 +1,6 @@
-# Markdown Links
+# Dendron Markdown Links
+
+🚨This is a fork of [Markdown Links](https://marketplace.visualstudio.com/items?itemName=tchayen.markdown-links) to support Dendron hierarchies! 🚨
 
 Adds command `Show Graph` that displays a graph of local links between Markdown files in the current working directory.
 
