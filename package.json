@@ -31,6 +31,10 @@
       {
         "command": "markdown-links.showGraph",
         "title": "Markdown Links: Show Graph"
+      },
+      {
+        "command": "markdown-links.reloadGraph",
+        "title": "Markdown Links: Reload Graph"
       }
     ],
     "configuration": {

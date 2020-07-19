@@ -153,8 +153,41 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       panel.webview.html = await getWebviewContent(context, graph, d3Uri);
+      panel.webview.onDidReceiveMessage(
+        (message) => {
+          if (message.type === "click") {
+            const openPath = vscode.Uri.file(message.payload.path);
+            const column = getColumnSetting("openColumn");
+    
+            vscode.workspace.openTextDocument(openPath).then((doc) => {
+              vscode.window.showTextDocument(doc, column);
+            });
+          }
+        },
+        undefined,
+        context.subscriptions
+      );
 
-      watch(context, panel, graph);
+      // watch(context, panel, graph);
+      context.subscriptions.push(
+        vscode.commands.registerCommand("markdown-links.reloadGraph", async () => {
+          const engine = DendronEngine.getOrCreateEngine({ root: vscode.workspace.rootPath as string, forceNew: true });
+          await engine.init();
+          const graph: Graph = {
+            nodes: [],
+            edges: [],
+          };
+          await parseEngine(graph, parseNote);
+          filterNonExistingEdges(graph);
+          const sendGraph = () => {
+            panel.webview.postMessage({
+              type: "refresh",
+              payload: graph,
+            });
+          };
+          sendGraph();
+        })
+      );
     })
   );
 
