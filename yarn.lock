@@ -45,10 +45,10 @@
     vscode-uri "^2.1.2"
     yamljs "^0.3.0"
 
-"@dendronhq/common-server@^0.3.21":
-  version "0.3.21"
-  resolved "https://registry.yarnpkg.com/@dendronhq/common-server/-/common-server-0.3.21.tgz#8180b0c3fee61fa452d7b1a4b99c2a834a51757b"
-  integrity sha512-kDnXJdZSAqXXf+ormDXuzRFDimi6SgV2Wx3Ult34BINIWxmU8zxhM3tr9DXnMdVI5dfYnwBxCU+r837sO3Nbgg==
+"@dendronhq/common-server@^0.3.26":
+  version "0.3.26"
+  resolved "https://registry.yarnpkg.com/@dendronhq/common-server/-/common-server-0.3.26.tgz#f95a755ad69396c9b109afaea28d8d5095c80950"
+  integrity sha512-ZRWGs8/zm772iOeQlGRt69+xHgbxu9lBXQT1iW9KvtvXRlEp2aOQZeTj76EpmIH/Nb88VVLRrqTRskPkT9XaTg==
   dependencies:
     "@dendronhq/common-all" "^0.3.21"
     fs-extra "^9.0.1"
@@ -60,12 +60,12 @@
     yamljs "^0.3.0"
 
 "@dendronhq/engine-server@^0.3.19":
-  version "0.3.21"
-  resolved "https://registry.yarnpkg.com/@dendronhq/engine-server/-/engine-server-0.3.21.tgz#0da5e8bfad1bb6e17f94bfc8ead25bdd90ea60ef"
-  integrity sha512-+m5MmymF06isPdBAnSKYq7CXWR6F7di+aW3bFmhw8gClFilt01J4BRh8L1ShCtnjUr/AESvEJ5mQNKPFulxxBw==
+  version "0.3.26"
+  resolved "https://registry.yarnpkg.com/@dendronhq/engine-server/-/engine-server-0.3.26.tgz#a52e45e4ef5bb96ae1db663c428f8ca5a45ab644"
+  integrity sha512-g6bdh6FOam743sEHhbiT7t3RZHe3ewpnZnJoLhbDFEJEVeOgaCrKaCf7QKp1pMz1+89RsuUNpabTK8gf3mMegQ==
   dependencies:
     "@dendronhq/common-all" "^0.3.21"
-    "@dendronhq/common-server" "^0.3.21"
+    "@dendronhq/common-server" "^0.3.26"
     fs-extra "^9.0.1"
     fuse.js "^6.3.0"
     gray-matter "^4.0.2"
