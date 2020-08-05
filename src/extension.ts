@@ -2,8 +2,19 @@ import * as vscode from "vscode";
 import { DendronEngine } from "@dendronhq/engine-server";
 import { TextDecoder } from "util";
 import * as path from "path";
-import { parseFile, parseDirectory, learnFileId, parseEngine, parseNote } from "./parsing";
-import { filterNonExistingEdges, getColumnSetting, getConfiguration, getFileTypesSetting } from "./utils";
+import {
+  parseFile,
+  parseDirectory,
+  learnFileId,
+  parseEngine,
+  parseNote,
+} from "./parsing";
+import {
+  filterNonExistingEdges,
+  getColumnSetting,
+  getConfiguration,
+  getFileTypesSetting,
+} from "./utils";
 import { Graph } from "./types";
 
 const watch = (
@@ -16,7 +27,10 @@ const watch = (
   }
 
   const watcher = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(vscode.workspace.rootPath, `**/*{${getFileTypesSetting().join(",")}}`),
+    new vscode.RelativePattern(
+      vscode.workspace.rootPath,
+      `**/*{${getFileTypesSetting().join(",")}}`
+    ),
     false,
     false,
     false
@@ -109,8 +123,9 @@ const watch = (
   });
 };
 
-export function activate(context: vscode.ExtensionContext) {
+let _PANEL;
 
+export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("markdown-links.showGraph", async () => {
@@ -125,6 +140,7 @@ export function activate(context: vscode.ExtensionContext) {
           retainContextWhenHidden: true,
         }
       );
+      _PANEL = panel;
 
       if (vscode.workspace.rootPath === undefined) {
         vscode.window.showErrorMessage(
@@ -133,7 +149,9 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const engine = DendronEngine.getOrCreateEngine({ root: vscode.workspace.rootPath});
+      const engine = DendronEngine.getOrCreateEngine({
+        root: vscode.workspace.rootPath,
+      });
       if (!engine.initialized) {
         await engine.init();
       }
@@ -158,7 +176,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (message.type === "click") {
             const openPath = vscode.Uri.file(message.payload.path);
             const column = getColumnSetting("openColumn");
-    
+
             vscode.workspace.openTextDocument(openPath).then((doc) => {
               vscode.window.showTextDocument(doc, column);
             });
@@ -169,25 +187,29 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       // watch(context, panel, graph);
-      context.subscriptions.push(
-        vscode.commands.registerCommand("markdown-links.reloadGraph", async () => {
-          const engine = DendronEngine.getOrCreateEngine({ root: vscode.workspace.rootPath as string, forceNew: true });
-          await engine.init();
-          const graph: Graph = {
-            nodes: [],
-            edges: [],
-          };
-          await parseEngine(graph, parseNote);
-          filterNonExistingEdges(graph);
-          const sendGraph = () => {
-            panel.webview.postMessage({
-              type: "refresh",
-              payload: graph,
-            });
-          };
-          sendGraph();
-        })
-      );
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("markdown-links.reloadGraph", async () => {
+      const engine = DendronEngine.getOrCreateEngine({
+        root: vscode.workspace.rootPath as string,
+        forceNew: true,
+      });
+      await engine.init();
+      const graph: Graph = {
+        nodes: [],
+        edges: [],
+      };
+      await parseEngine(graph, parseNote);
+      filterNonExistingEdges(graph);
+      const sendGraph = () => {
+        _PANEL.webview.postMessage({
+          type: "refresh",
+          payload: graph,
+        });
+      };
+      sendGraph();
     })
   );
 
