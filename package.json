@@ -22,8 +22,7 @@
   },
   "license": "MIT",
   "activationEvents": [
-    "onLanguage:markdown",
-    "onCommand:markdown-links.showGraph"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -31,6 +30,10 @@
       {
         "command": "markdown-links.showGraph",
         "title": "Markdown Links: Show Graph"
+      },
+      {
+        "command": "dendron.showSchemaGraph",
+        "title": "Dendron: Show Schema Graph"
       }
     ],
     "configuration": {
@@ -87,7 +90,10 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@dendronhq/common-all": "0.7.9",
+    "@dendronhq/engine-server": "0.7.10-alpha.1",
     "@types/md5": "^2.2.0",
+    "lodash": "^4.17.20",
     "md5": "^2.2.1",
     "remark-frontmatter": "^2.0.0",
     "remark-parse": "^8.0.2",

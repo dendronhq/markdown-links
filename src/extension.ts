@@ -9,6 +9,7 @@ import {
   getFileTypesSetting,
 } from "./utils";
 import { Graph } from "./types";
+import { ShowSchemaCommand } from "./dendron";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -120,41 +121,49 @@ const watch = (
 };
 
 export function activate(context: vscode.ExtensionContext) {
+
   context.subscriptions.push(
-    vscode.commands.registerCommand("markdown-links.showGraph", async () => {
-      const column = getColumnSetting("showColumn");
-
-      const panel = vscode.window.createWebviewPanel(
-        "markdownLinks",
-        "Markdown Links",
-        column,
-        {
-          enableScripts: true,
-          retainContextWhenHidden: true,
-        }
-      );
-
-      if (vscode.workspace.rootPath === undefined) {
-        vscode.window.showErrorMessage(
-          "This command can only be activated in open directory"
-        );
-        return;
-      }
-
-      const graph: Graph = {
-        nodes: [],
-        edges: [],
-      };
-
-      await parseDirectory(graph, learnFileId);
-      await parseDirectory(graph, parseFile);
-      filterNonExistingEdges(graph);
-
-      panel.webview.html = await getWebviewContent(context, panel, graph);
-
-      watch(context, panel, graph);
+    vscode.commands.registerCommand(ShowSchemaCommand.id, async () => {
+      await new ShowSchemaCommand().execute(context);
     })
   );
+
+
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand("markdown-links.showGraph", async () => {
+  //     const column = getColumnSetting("showColumn");
+
+  //     const panel = vscode.window.createWebviewPanel(
+  //       "markdownLinks",
+  //       "Markdown Links",
+  //       column,
+  //       {
+  //         enableScripts: true,
+  //         retainContextWhenHidden: true,
+  //       }
+  //     );
+
+  //     if (vscode.workspace.rootPath === undefined) {
+  //       vscode.window.showErrorMessage(
+  //         "This command can only be activated in open directory"
+  //       );
+  //       return;
+  //     }
+
+  //     const graph: Graph = {
+  //       nodes: [],
+  //       edges: [],
+  //     };
+
+  //     await parseDirectory(graph, learnFileId);
+  //     await parseDirectory(graph, parseFile);
+  //     filterNonExistingEdges(graph);
+
+  //     panel.webview.html = await getWebviewContent(context, panel, graph);
+
+  //     watch(context, panel, graph);
+  //   })
+  // );
 
   const shouldAutoStart = getConfiguration("autoStart");
 
@@ -163,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 }
 
-async function getWebviewContent(
+export async function getWebviewContent(
   context: vscode.ExtensionContext,
   panel: vscode.WebviewPanel,
   graph: Graph
