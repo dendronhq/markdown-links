@@ -9,8 +9,8 @@ import {
   getFileTypesSetting,
 } from "./utils";
 import { Graph } from "./types";
-import { ShowSchemaCommand } from "./dendron";
 import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
+import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
 
 const watch = (
   context: vscode.ExtensionContext,
