@@ -10,6 +10,7 @@ import {
 } from "./utils";
 import { Graph } from "./types";
 import { ShowSchemaCommand } from "./dendron";
+import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -125,6 +126,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(ShowSchemaCommand.id, async () => {
       await new ShowSchemaCommand().execute(context);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(ShowNotesCommand.id, async () => {
+      await new ShowNotesCommand().execute(context);
     })
   );
 

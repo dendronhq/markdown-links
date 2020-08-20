@@ -1,7 +1,6 @@
 import { DEngine, Schema } from "@dendronhq/common-all";
 import { DendronEngine } from "@dendronhq/engine-server";
 import * as _ from "lodash";
-import { posix } from "path";
 import {
   ExtensionContext,
   ViewColumn,
@@ -12,19 +11,70 @@ import {
 import { getWebviewContent } from "../extension";
 import { Graph } from "../types";
 import { filterNonExistingEdges, getColumnSetting } from "../utils";
+import { PanelMode, PanelType } from "./types";
 import { createWatcher } from "./watcher";
 import path = require("path");
-import { PanelMode, PanelType } from "./types";
-import { setPanel, getPanel, sendGraph } from "./base";
 
-export class ShowSchemaCommand {
-  static id: string = "dendron.showSchemaGraph";
+const PANELS: {
+  [key in PanelType]: { [key in PanelMode]: undefined | WebviewPanel };
+} = {
+  note: {
+    hierarchy: undefined,
+  },
+  schema: {
+    hierarchy: undefined,
+  },
+};
 
+const GRAPHS: {
+  [key in PanelType]: { [key in PanelMode]: Graph };
+} = {
+  note: {
+    hierarchy: { nodes: [], edges: [] },
+  },
+  schema: {
+    hierarchy: { nodes: [], edges: [] },
+  },
+};
+
+
+export function getPanel(
+    type: PanelType,
+    mode?: PanelMode
+  ): WebviewPanel | undefined {
+    if (!mode) {
+      mode = "hierarchy";
+    }
+    const maybePanel = PANELS[type][mode];
+    return maybePanel;
+  }
+  
+  export function setPanel(
+    type: PanelType,
+    panel: WebviewPanel,
+    mode?: PanelMode
+  ) {
+    if (!mode) {
+      mode = "hierarchy";
+    }
+    PANELS[type][mode] = panel;
+  }
+  
+  export const sendGraph = (panel: WebviewPanel, graph: Graph) => {
+    panel.webview.postMessage({
+      type: "refresh",
+      payload: graph,
+    });
+  };
+
+  
+
+export class BaseCommand {
   createPanel(type: PanelType, column: ViewColumn): WebviewPanel {
     const mode: PanelMode = "hierarchy";
     const panel = window.createWebviewPanel(
       "dendron",
-      `${type} Links`,
+      `${_.capitalize(type)} Links`,
       column,
       {
         enableScripts: true,
@@ -96,35 +146,3 @@ export class ShowSchemaCommand {
     createWatcher(context, maybePanel, graph);
   }
 }
-
-export const parseSchema = async (graph: Graph, note: Schema) => {
-  const index = graph.nodes.findIndex((node) => node.path === note.path);
-  const title = note.title;
-  if (!title) {
-    if (index !== -1) {
-      graph.nodes.splice(index, 1);
-    }
-
-    return;
-  }
-
-  if (index !== -1) {
-    graph.nodes[index].label = title;
-  } else {
-    // add node to graph
-    // TODO: temp
-    const fullPath = posix.join(
-      DendronEngine.getOrCreateEngine().props.root,
-      posix.basename(note.uri.authority)
-    );
-    const node = { id: note.id, path: fullPath, label: title };
-    graph.nodes.push(node);
-  }
-
-  // Remove edges based on an old version of this file.
-  // graph.edges = graph.edges.filter((edge) => edge.source !== note.id);
-  note.children.forEach((c) => {
-    let target = c;
-    graph.edges.push({ source: note.id, target: c.id });
-  });
-};

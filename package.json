@@ -34,6 +34,10 @@
       {
         "command": "dendron.showSchemaGraph",
         "title": "Dendron: Show Schema Graph"
+      },
+      {
+        "command": "dendron.showNoteGraph",
+        "title": "Dendron: Show Note Graph"
       }
     ],
     "configuration": {
