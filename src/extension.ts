@@ -179,11 +179,11 @@ export function activate(context: vscode.ExtensionContext) {
   //   })
   // );
 
-  const shouldAutoStart = getConfiguration("autoStart");
+  // const shouldAutoStart = getConfiguration("autoStart");
 
-  if (shouldAutoStart) {
-    vscode.commands.executeCommand("markdown-links.showGraph");
-  }
+  // if (shouldAutoStart) {
+  //   vscode.commands.executeCommand("markdown-links.showGraph");
+  // }
 }
 
 export async function getWebviewContent(

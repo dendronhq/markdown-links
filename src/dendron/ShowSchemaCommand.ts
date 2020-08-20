@@ -1,16 +1,34 @@
-import { Schema } from "@dendronhq/common-all";
+import { Schema, DNode, DEngine } from "@dendronhq/common-all";
 import * as _ from "lodash";
 import { ExtensionContext } from "vscode";
 import { getWebviewContent } from "../extension";
-import { Graph } from "../types";
+import { Graph, Node } from "../types";
 import { filterNonExistingEdges, getColumnSetting } from "../utils";
-import { BaseCommand, getPanel, sendGraph, ShowNodeCommand } from "./base";
+import { BaseCommand, getPanel, sendGraph, ShowNodeCommand, getGraph } from "./base";
 import { createWatcher } from "./watcher";
 import path = require("path");
 
 
 export class ShowSchemaCommand extends ShowNodeCommand {
   static id: string = "dendron.showSchemaGraph";
+
+  getNodes(engine: DEngine): DNode[] {
+    const schemas = engine.schemas;
+    const root = engine.schemas['root'];
+    if (!root) {
+      throw Error(`no root schema found`);
+    }
+    const domains = _.reject(schemas, { id: "root" });
+    domains.forEach((d) => {
+      root.addChild(d);
+    });
+    const nodes = [root];
+    return nodes;
+  }
+
+  getId = (s: Schema) => `${s.fname}.${s.id}`;
+  getLabel = (n: Schema) => `${n.id}`;
+  getExtension = () => `.yml`;
 
   async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
     const cleanOpts = _.defaults(opts, {silent: false});
@@ -21,34 +39,11 @@ export class ShowSchemaCommand extends ShowNodeCommand {
       maybePanel = this.createPanel("schema", column);
       firstLaunch = true;
     }
+    const type = "schema";
     const engine = await this.getEngine();
-    const graph: Graph = {
-      nodes: [],
-      edges: [],
-    };
-    const schemaDict = engine.schemas;
-    const schemas = Object.values(schemaDict);
-    const root = _.find(schemas, { id: "root" });
-    if (!root) {
-      throw Error(`no root schema found`);
-    }
-    const domains = _.reject(schemas, { id: "root" });
-    domains.forEach((d) => {
-      root.addChild(d);
-    });
-    const nodes = [root];
-    const getId = (s: Schema) => `${s.fname}.${s.id}`;
-    while (!_.isEmpty(nodes)) {
-      const n = nodes.pop() as Schema;
-      const fullPath = path.join(engine.props.root, n.fname + ".yml");
-      const gNote = { id: getId(n), path: fullPath, label: n.id };
-      graph.nodes.push(gNote);
-      n.children.forEach((c) => {
-        graph.edges.push({ source: getId(n), target: getId(c as Schema) });
-        nodes.push(c as Schema);
-      });
-    }
-    filterNonExistingEdges(graph);
+    const graph = { nodes: [], edges: [] };
+    const nodes = this.getNodes(engine);
+    this.parseGraph(nodes, engine, graph);
     maybePanel.webview.html = await getWebviewContent(
       context,
       maybePanel,

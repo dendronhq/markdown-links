@@ -1,4 +1,4 @@
-import { DEngine, Schema } from "@dendronhq/common-all";
+import { DEngine, Schema, DNode } from "@dendronhq/common-all";
 import { DendronEngine } from "@dendronhq/engine-server";
 import * as _ from "lodash";
 import {
@@ -36,6 +36,29 @@ const GRAPHS: {
     hierarchy: { nodes: [], edges: [] },
   },
 };
+
+export function getGraph(
+  type: PanelType,
+  mode?: PanelMode
+): Graph {
+  if (!mode) {
+    mode = "hierarchy";
+  }
+  const graph = GRAPHS[type][mode];
+  return graph;
+}
+
+export function setGraph(
+  type: PanelType,
+  graph: Graph,
+  mode?: PanelMode
+) {
+  if (!mode) {
+    mode = "hierarchy";
+  }
+  GRAPHS[type][mode] = graph;
+}
+
 
 export function deletePanel(
   type: PanelType,
@@ -112,6 +135,27 @@ export class BaseCommand {
 }
 
 export abstract class ShowNodeCommand extends BaseCommand {
+
+  abstract getId(n: DNode): string;
+  abstract getLabel(n: DNode): string;
+  abstract getExtension(): string;
+
+  async parseGraph(nodes: DNode[], engine: DEngine, graph: Graph): Promise<Graph> {
+    const getId = this.getId;
+    while (!_.isEmpty(nodes)) {
+      const n = nodes.pop() as DNode;
+      const fullPath = path.join(engine.props.root, n.fname + this.getExtension());
+      const gNote = { id: getId(n), path: fullPath, label: this.getLabel(n) };
+      graph.nodes.push(gNote);
+      n.children.forEach((c) => {
+        graph.edges.push({ source: getId(n), target: getId(c as DNode) });
+        nodes.push(c as Schema);
+      });
+    }
+    filterNonExistingEdges(graph);
+    return graph;
+  }
+
   abstract async execute(
     context: ExtensionContext,
     opts?: { silent?: boolean }
