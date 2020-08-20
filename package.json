@@ -28,16 +28,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "markdown-links.showGraph",
-        "title": "Markdown Links: Show Graph"
-      },
-      {
         "command": "dendron.showSchemaGraph",
         "title": "Dendron: Show Schema Graph"
       },
       {
         "command": "dendron.showNoteGraph",
         "title": "Dendron: Show Note Graph"
+      },
+      {
+        "command": "dendron.reloadGraphs",
+        "title": "Dendron: Reload Graphs"
       }
     ],
     "configuration": {

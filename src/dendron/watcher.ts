@@ -1,11 +1,14 @@
 import { ExtensionContext, WebviewPanel, workspace, Uri, window } from "vscode";
 import { Graph } from "../types";
 import { getColumnSetting } from "../utils";
+import { PanelType } from "./types";
+import { getPanel, deletePanel } from "./base";
 
 export const createWatcher = (
     context: ExtensionContext,
     panel: WebviewPanel,
-    graph: Graph
+    graph: Graph,
+    type: PanelType
   ) => {
     if (workspace.rootPath === undefined) {
       return;
@@ -107,6 +110,7 @@ export const createWatcher = (
     );
   
     panel.onDidDispose(() => {
+      deletePanel(type, "hierarchy");
     //   watcher.dispose();
     });
   };

@@ -11,6 +11,7 @@ import {
 import { Graph } from "./types";
 import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
 import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
+import { ReloadGraphCommand } from "./dendron/ReloadGraphCommand";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -132,6 +133,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(ShowNotesCommand.id, async () => {
       await new ShowNotesCommand().execute(context);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(ReloadGraphCommand.id, async () => {
+      await new ReloadGraphCommand().execute(context);
     })
   );
 

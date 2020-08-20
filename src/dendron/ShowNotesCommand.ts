@@ -1,4 +1,4 @@
-import { BaseCommand, getPanel, sendGraph } from "./base";
+import { BaseCommand, getPanel, sendGraph, ShowNodeCommand } from "./base";
 import { ExtensionContext } from "vscode";
 import { getColumnSetting, filterNonExistingEdges } from "../utils";
 import { Graph } from "../types";
@@ -8,21 +8,23 @@ import { getWebviewContent } from "../extension";
 import { createWatcher } from "./watcher";
 import * as _ from 'lodash';
 
-export class ShowNotesCommand extends BaseCommand {
+export class ShowNotesCommand extends ShowNodeCommand {
   static id: string = "dendron.showNoteGraph";
 
-  async execute(context: ExtensionContext) {
+  async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
+    const cleanOpts = _.defaults(opts, {silent: false});
     const column = getColumnSetting("showColumn");
     let maybePanel = getPanel("note");
+    let firstLaunch = false;
     if (!maybePanel) {
       maybePanel = this.createPanel("note", column);
+      firstLaunch = true;
     }
     const engine = await this.getEngine();
     const graph: Graph = {
       nodes: [],
       edges: [],
     };
-    const noteDict = engine.notes;
     const root = engine.notes['root'];
     if (!root) {
       throw Error(`no root note found`);
@@ -45,7 +47,11 @@ export class ShowNotesCommand extends BaseCommand {
       maybePanel,
       graph
     );
-    sendGraph(maybePanel, graph);
-    createWatcher(context, maybePanel, graph);
+    if (!cleanOpts.silent) {
+      sendGraph(maybePanel, graph);
+    }
+    if (firstLaunch) {
+      createWatcher(context, maybePanel, graph, "note");
+    }
   }
 }

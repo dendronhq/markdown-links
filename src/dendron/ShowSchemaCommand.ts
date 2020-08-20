@@ -4,27 +4,28 @@ import { ExtensionContext } from "vscode";
 import { getWebviewContent } from "../extension";
 import { Graph } from "../types";
 import { filterNonExistingEdges, getColumnSetting } from "../utils";
-import { BaseCommand, getPanel, sendGraph } from "./base";
+import { BaseCommand, getPanel, sendGraph, ShowNodeCommand } from "./base";
 import { createWatcher } from "./watcher";
 import path = require("path");
 
 
-export class ShowSchemaCommand extends BaseCommand {
+export class ShowSchemaCommand extends ShowNodeCommand {
   static id: string = "dendron.showSchemaGraph";
 
-  async execute(context: ExtensionContext) {
+  async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
+    const cleanOpts = _.defaults(opts, {silent: false});
     const column = getColumnSetting("showColumn");
     let maybePanel = getPanel("schema");
+    let firstLaunch = false;
     if (!maybePanel) {
       maybePanel = this.createPanel("schema", column);
+      firstLaunch = true;
     }
     const engine = await this.getEngine();
     const graph: Graph = {
       nodes: [],
       edges: [],
     };
-    //await parseEngine(graph, parseNote);
-    // get all domains
     const schemaDict = engine.schemas;
     const schemas = Object.values(schemaDict);
     const root = _.find(schemas, { id: "root" });
@@ -53,7 +54,11 @@ export class ShowSchemaCommand extends BaseCommand {
       maybePanel,
       graph
     );
-    sendGraph(maybePanel, graph);
-    createWatcher(context, maybePanel, graph);
+    if (!cleanOpts.silent) {
+      sendGraph(maybePanel, graph);
+    }
+    if (firstLaunch) {
+      createWatcher(context, maybePanel, graph, "schema");
+    }
   }
 }
