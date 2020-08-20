@@ -1,9 +1,9 @@
 {
-  "name": "markdown-links",
-  "displayName": "Markdown Links",
-  "description": "Adds command - Show Graph - that displays a graph of local links between markdown files in the current working directory.",
-  "version": "0.7.0",
-  "publisher": "tchayen",
+  "name": "dendron-markdown-links",
+  "displayName": "Dendron Markdown Links",
+  "description": "Graph viz for Dendron Notes and Schemas",
+  "version": "0.6.7",
+  "publisher": "dendron",
   "engines": {
     "vscode": "^1.45.0"
   },
@@ -14,11 +14,11 @@
     "markdown"
   ],
   "bugs": {
-    "url": "https://github.com/tchayen/markdown-links/issues"
+    "url": "https://github.com/dendronhq/markdown-links/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tchayen/markdown-links"
+    "url": "https://github.com/dendronhq/markdown-links"
   },
   "license": "MIT",
   "activationEvents": [
