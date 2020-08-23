@@ -46,7 +46,7 @@ const watch = (
     sendGraph();
   });
 
-  // Watch file creation in case user adds a new file
+  // Watch file creation in case user adds a new file.
   watcher.onDidCreate(async (event) => {
     await parseFile(graph, event.path);
     filterNonExistingEdges(graph);
@@ -54,16 +54,18 @@ const watch = (
   });
 
   watcher.onDidDelete(async (event) => {
-    const index = graph.nodes.findIndex((node) => node.path === event.path);
+    const filePath = path.normalize(event.path);
+    const index = graph.nodes.findIndex((node) => node.path === filePath);
     if (index === -1) {
       return;
     }
 
     graph.nodes.splice(index, 1);
     graph.edges = graph.edges.filter(
-      (edge) => edge.source !== event.path && edge.target !== event.path
+      (edge) => edge.source !== filePath && edge.target !== filePath
     );
 
+    filterNonExistingEdges(graph);
     sendGraph();
   });
 
@@ -76,8 +78,8 @@ const watch = (
 
   vscode.workspace.onDidRenameFiles(async (event) => {
     for (const file of event.files) {
-      const previous = file.oldUri.path;
-      const next = file.newUri.path;
+      const previous = path.normalize(file.oldUri.path);
+      const next = path.normalize(file.newUri.path);
 
       for (const edge of graph.edges) {
         if (edge.source === previous) {
@@ -188,8 +190,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export async function getWebviewContent(
   context: vscode.ExtensionContext,
-  panel: vscode.WebviewPanel,
-  graph: Graph
+  panel: vscode.WebviewPanel
 ) {
   const webviewPath = vscode.Uri.file(
     path.join(context.extensionPath, "static", "webview.html")
@@ -205,9 +206,20 @@ export async function getWebviewContent(
       )
       .toString();
 
+  const graphDirectory = path.join("graphs", getConfiguration("graphType"));
+  const textWithVariables = text
+    .replace(
+      "${graphPath}",
+      "{{" + path.join(graphDirectory, "graph.js") + "}}"
+    )
+    .replace(
+      "${graphStylesPath}",
+      "{{" + path.join(graphDirectory, "graph.css") + "}}"
+    );
+
   // Basic templating. Will replace {{someScript.js}} with the
   // appropriate webview URI.
-  const filled = text.replace(/\{\{.*\}\}/g, (match) => {
+  const filled = textWithVariables.replace(/\{\{.*\}\}/g, (match) => {
     const fileName = match.slice(2, -2).trim();
     return webviewUri(fileName);
   });
