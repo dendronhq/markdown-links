@@ -103,8 +103,8 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "@dendronhq/common-all": "0.7.9",
-    "@dendronhq/engine-server": "0.7.10-alpha.1",
+    "@dendronhq/common-all": "0.7.13-alpha.3",
+    "@dendronhq/engine-server": "0.7.13-alpha.3",
     "@types/md5": "^2.2.0",
     "lodash": "^4.17.20",
     "md5": "^2.2.1",

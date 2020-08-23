@@ -40,7 +40,6 @@ export class ShowNotesCommand extends ShowNodeCommand {
     maybePanel.webview.html = await getWebviewContent(
       context,
       maybePanel,
-      graph
     );
     if (!cleanOpts.silent) {
       sendGraph(maybePanel, graph);

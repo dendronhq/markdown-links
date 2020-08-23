@@ -27,7 +27,7 @@ export class ShowSchemaCommand extends ShowNodeCommand {
   }
 
   getId = (s: Schema) => `${s.fname}.${s.id}`;
-  getLabel = (n: Schema) => `${n.id}`;
+  getLabel = (n: Schema) => `${n.title}`;
   getExtension = () => `.yml`;
 
   async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
@@ -47,7 +47,6 @@ export class ShowSchemaCommand extends ShowNodeCommand {
     maybePanel.webview.html = await getWebviewContent(
       context,
       maybePanel,
-      graph
     );
     if (!cleanOpts.silent) {
       sendGraph(maybePanel, graph);
