@@ -2,7 +2,7 @@ import { BaseCommand, getPanel, sendGraph, ShowNodeCommand, getGraph } from "./b
 import { ExtensionContext } from "vscode";
 import { getColumnSetting, filterNonExistingEdges } from "../utils";
 import { Graph } from "../types";
-import { NotePropsV2, DEngineClientV2, DNodePropsV2 } from "@dendronhq/common-all";
+import { NotePropsV2, DEngineClientV2, DNodePropsV2, NoteUtilsV2, DNodeUtilsV2 } from "@dendronhq/common-all";
 import path = require("path");
 import { getWebviewContent } from "../extension";
 import { createWatcher } from "./watcher";
@@ -22,11 +22,11 @@ export class ShowNotesCommand extends ShowNodeCommand {
   }
 
   getNodes(engine: DEngineClientV2): DNodePropsV2[] {
-    const root = _.find(engine.notes, {fname: "root"});
-    if (!root) {
-      throw Error(`no root schema found`);
+    const roots = _.filter(engine.notes, DNodeUtilsV2.isRoot);
+    if (_.isEmpty(roots)) {
+      throw Error(`no root found for notes`);
     }
-    return [root];
+    return roots;
   }
 
   async execute(context: ExtensionContext, opts?: {silent?: boolean}) {

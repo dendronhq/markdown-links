@@ -1,6 +1,7 @@
 import {
   DEngineClientV2,
   DNodePropsV2,
+  DNodeUtilsV2,
   SchemaModulePropsV2,
   SchemaPropsV2,
   SchemaUtilsV2,
@@ -25,7 +26,7 @@ export class ShowSchemaCommand extends ShowNodeCommand {
 
   getNodes(engine: DEngineClientV2): DNodePropsV2[] {
     const schemas = engine.schemas;
-    const domains = _.reject(schemas, { id: "root" });
+    const domains = _.reject(schemas, DNodeUtilsV2.isRoot);
     const nodes = domains;
     return nodes;
   }
