@@ -38,6 +38,10 @@ export class ShowSchemaCommand extends ShowNodeCommand {
   getExtension = () => `.yml`;
 
   async execute(context: ExtensionContext, opts?: { silent?: boolean }) {
+    const engine = await this.getEngine();
+    if (!engine) {
+      return;
+    }
     const cleanOpts = _.defaults(opts, { silent: false });
     const column = getColumnSetting("showColumn");
     let maybePanel = getPanel("schema");
@@ -47,10 +51,6 @@ export class ShowSchemaCommand extends ShowNodeCommand {
       firstLaunch = true;
     }
     const type = "schema";
-    const engine = await this.getEngine();
-    if (!engine) {
-      return;
-    }
     const graph = { nodes: [], edges: [] };
     const nodes = (this.getNodes(engine) as unknown) as SchemaModulePropsV2[];
     await Promise.all(

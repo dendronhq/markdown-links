@@ -30,6 +30,10 @@ export class ShowNotesCommand extends ShowNodeCommand {
   }
 
   async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
+    const engine = await this.getEngine();
+    if (!engine) {
+      return;
+    }
     const cleanOpts = _.defaults(opts, {silent: false});
     const column = getColumnSetting("showColumn");
     let maybePanel = getPanel("NotePropsV2");
@@ -38,10 +42,6 @@ export class ShowNotesCommand extends ShowNodeCommand {
     if (!maybePanel) {
       maybePanel = this.createPanel("NotePropsV2", column);
       firstLaunch = true;
-    }
-    const engine = await this.getEngine();
-    if (!engine) {
-      return;
     }
     const graph = { nodes: [], edges: [] };
     const nodes = this.getNodes(engine);
