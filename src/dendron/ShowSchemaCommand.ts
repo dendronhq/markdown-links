@@ -26,8 +26,10 @@ export class ShowSchemaCommand extends ShowNodeCommand {
 
   getNodes(engine: DEngineClientV2): DNodePropsV2[] {
     const schemas = engine.schemas;
+    // @ts-ignore
     const domains = _.reject(schemas, DNodeUtilsV2.isRoot);
     const nodes = domains;
+    // @ts-ignore
     return nodes;
   }
 
