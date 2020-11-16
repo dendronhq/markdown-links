@@ -37,10 +37,6 @@
       {
         "command": "dendron.showNoteGraph",
         "title": "Dendron: Show Note Graph"
-      },
-      {
-        "command": "dendron.reloadGraphs",
-        "title": "Dendron: Reload Graphs"
       }
     ],
     "configuration": {
