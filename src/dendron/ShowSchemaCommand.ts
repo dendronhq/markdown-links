@@ -34,7 +34,7 @@ export class ShowSchemaCommand extends ShowNodeCommand {
   }
 
   getId = (s: SchemaPropsV2) => `${s.id}`;
-  getLabel = (n: SchemaPropsV2) => `${n.title}`;
+  getLabel = (n: SchemaPropsV2) => `${n.title || n.id}`;
   getExtension = () => `.yml`;
 
   async execute(context: ExtensionContext, opts?: { silent?: boolean }) {
