@@ -12,6 +12,7 @@ import { Graph } from "./types";
 import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
 import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
 import { ReloadGraphCommand } from "./dendron/ReloadGraphCommand";
+import { setupDendron } from "./dendron/base";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -143,6 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
       await new ReloadGraphCommand().execute(context);
     })
   );
+  setupDendron(context);
 
 
   // context.subscriptions.push(

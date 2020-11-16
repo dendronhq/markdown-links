@@ -2,7 +2,7 @@ import { BaseCommand, getPanel, sendGraph, ShowNodeCommand, getGraph } from "./b
 import { ExtensionContext } from "vscode";
 import { getColumnSetting, filterNonExistingEdges } from "../utils";
 import { Graph } from "../types";
-import { Note, DEngine, DNode } from "@dendronhq/common-all";
+import { NotePropsV2, DEngineClientV2, DNodePropsV2 } from "@dendronhq/common-all";
 import path = require("path");
 import { getWebviewContent } from "../extension";
 import { createWatcher } from "./watcher";
@@ -10,13 +10,19 @@ import * as _ from 'lodash';
 
 export class ShowNotesCommand extends ShowNodeCommand {
   static id: string = "dendron.showNoteGraph";
+  public type: "note"|"schema";
 
-  getId = (s: Note) => `${s.fname}.${s.id}`;
-  getLabel = (n: Note) => `${n.title}`;
+  getId = (s: NotePropsV2) => `${s.fname}.${s.id}`;
+  getLabel = (n: NotePropsV2) => `${n.title}`;
   getExtension = () => `.md`;
 
-  getNodes(engine: DEngine): DNode[] {
-    const root = engine.notes['root'];
+  constructor() {
+    super();
+    this.type = "note";
+  }
+
+  getNodes(engine: DEngineClientV2): DNodePropsV2[] {
+    const root = _.find(engine.notes, {fname: "root"});
     if (!root) {
       throw Error(`no root schema found`);
     }
@@ -26,14 +32,17 @@ export class ShowNotesCommand extends ShowNodeCommand {
   async execute(context: ExtensionContext, opts?: {silent?: boolean}) {
     const cleanOpts = _.defaults(opts, {silent: false});
     const column = getColumnSetting("showColumn");
-    let maybePanel = getPanel("note");
-    const type = "note";
+    let maybePanel = getPanel("NotePropsV2");
+    const type = "NotePropsV2";
     let firstLaunch = false;
     if (!maybePanel) {
-      maybePanel = this.createPanel("note", column);
+      maybePanel = this.createPanel("NotePropsV2", column);
       firstLaunch = true;
     }
     const engine = await this.getEngine();
+    if (!engine) {
+      return;
+    }
     const graph = { nodes: [], edges: [] };
     const nodes = this.getNodes(engine);
     this.parseGraph(nodes, engine, graph);
@@ -45,7 +54,7 @@ export class ShowNotesCommand extends ShowNodeCommand {
       sendGraph(maybePanel, graph);
     }
     if (firstLaunch) {
-      createWatcher(context, maybePanel, graph, "note");
+      createWatcher(context, maybePanel, graph, "NotePropsV2");
     }
   }
 }

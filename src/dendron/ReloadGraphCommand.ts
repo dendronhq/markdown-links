@@ -8,8 +8,12 @@ export class ReloadGraphCommand extends BaseCommand {
     static id: string = "dendron.reloadGraphs";
 
     async execute(context: ExtensionContext) {
-        const engine = await this.getEngine(true);
-        await Promise.all((["schema", "note"] as const).map( async (ntype: PanelType) => {
+        const engine = await this.getEngine();
+        if (!engine) {
+            return;
+        }
+        await engine.init();
+        await Promise.all((["schema", "NotePropsV2"] as const).map( async (ntype: PanelType) => {
             const panel = getPanel(ntype);
             if (panel) {
                 let cmd: ShowSchemaCommand|ShowNotesCommand;
