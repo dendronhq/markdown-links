@@ -24,11 +24,11 @@
   "activationEvents": [
     "*"
   ],
+  "extensionDependencies": [
+    "dendron.dendron"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
-    "extensionDependencies": [
-      "dendron.dendron"
-    ],
     "commands": [
       {
         "command": "dendron.showSchemaGraph",
