@@ -109,7 +109,7 @@
   },
   "dependencies": {
     "@dendronhq/common-all": "0.16.0",
-    "@dendronhq/engine-server": "0.16.0",
+    "@dendronhq/engine-server": "0.16.1-alpha.0",
     "@types/md5": "^2.2.0",
     "lodash": "^4.17.20",
     "md5": "^2.2.1",
