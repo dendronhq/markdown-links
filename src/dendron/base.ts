@@ -17,6 +17,7 @@ import { Graph } from "../types";
 import { filterNonExistingEdges } from "../utils";
 import { PanelMode, PanelType } from "./types";
 import path = require("path");
+import { Logger } from "../logger";
 
 const PANELS: {
   [key in PanelType]: { [key in PanelMode]: undefined | WebviewPanel };
@@ -92,6 +93,7 @@ export const sendGraph = (panel: WebviewPanel, graph: Graph) => {
 };
 
 export async function setupDendron(context: vscode.ExtensionContext) {
+  const ctx = "setupDendron";
   const wsRoot = path.dirname(
     vscode.workspace?.workspaceFile?.fsPath as string
   );
@@ -99,11 +101,13 @@ export async function setupDendron(context: vscode.ExtensionContext) {
     fsPath: v.uri.fsPath,
   }));
   const fpath = getWSMetaFilePath({ wsRoot });
+  Logger.info({ ctx, wsRoot, vaults, metaFile: fpath, msg: "enter" });
   if (fs.existsSync(fpath)) {
     const connector = new EngineConnector({ wsRoot, vaults });
+    Logger.info({ ctx, msg: "pre:connectorInit" });
     await connector.init({
       onReady: async () => {
-        console.log("ready");
+        Logger.info({ ctx, msg: "post:connectorInit" });
         setInterval(async () => {
           connector.engine.sync();
         }, 5000);
@@ -129,8 +133,14 @@ export class BaseCommand {
   }
 
   async getEngine(): Promise<DEngineClientV2 | undefined> {
+    const ctx = "getEngine";
     const connector = EngineConnector.instance();
     if (_.isUndefined(connector._engine) || !connector.initialized) {
+      Logger.info({
+        ctx,
+        init: connector.initialized,
+        engine: connector._engine,
+      });
       vscode.window.showInformationMessage(
         "still connecting to engine. please try again in a few moments..."
       );
@@ -143,12 +153,12 @@ export class BaseCommand {
 export abstract class ShowNodeCommand extends BaseCommand {
   public abstract type: "note" | "schema";
 
-  abstract getId(n: NotePropsV2|SchemaPropsV2): string;
-  abstract getLabel(n: NotePropsV2|SchemaPropsV2): string;
+  abstract getId(n: NotePropsV2 | SchemaPropsV2): string;
+  abstract getLabel(n: NotePropsV2 | SchemaPropsV2): string;
   abstract getExtension(): string;
 
   async parseGraph(
-    nodes: SchemaModulePropsV2[]|NotePropsV2[],
+    nodes: SchemaModulePropsV2[] | NotePropsV2[],
     engine: DEngineClientV2,
     graph: Graph
   ): Promise<Graph> {
@@ -173,7 +183,7 @@ export abstract class ShowNodeCommand extends BaseCommand {
         const schemaModule = n as SchemaModulePropsV2;
         const root = schemaModule.vault.fsPath;
         const fname = schemaModule.fname;
-        const fullPath = SchemaUtilsV2.getPath({root, fname});
+        const fullPath = SchemaUtilsV2.getPath({ root, fname });
         let schema = schemaModule.root;
         const gNote = {
           id: getId(schema),

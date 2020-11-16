@@ -13,6 +13,7 @@ import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
 import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
 import { ReloadGraphCommand } from "./dendron/ReloadGraphCommand";
 import { setupDendron } from "./dendron/base";
+import { Logger } from "./logger";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -126,6 +127,7 @@ const watch = (
 };
 
 export function activate(context: vscode.ExtensionContext) {
+  Logger.configure(context, "debug");
 
   context.subscriptions.push(
     vscode.commands.registerCommand(ShowSchemaCommand.id, async () => {
