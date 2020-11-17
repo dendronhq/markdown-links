@@ -36,11 +36,10 @@ export class ShowNotesCommand extends ShowNodeCommand {
     }
     const cleanOpts = _.defaults(opts, {silent: false});
     const column = getColumnSetting("showColumn");
-    let maybePanel = getPanel("NotePropsV2");
-    const type = "NotePropsV2";
+    let maybePanel = getPanel("Notes");
     let firstLaunch = false;
     if (!maybePanel) {
-      maybePanel = this.createPanel("NotePropsV2", column);
+      maybePanel = this.createPanel("Notes", column);
       firstLaunch = true;
     }
     const graph = { nodes: [], edges: [] };
@@ -54,7 +53,7 @@ export class ShowNotesCommand extends ShowNodeCommand {
       sendGraph(maybePanel, graph);
     }
     if (firstLaunch) {
-      createWatcher(context, maybePanel, graph, "NotePropsV2");
+      createWatcher(context, maybePanel, graph, "Notes");
     }
   }
 }

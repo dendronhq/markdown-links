@@ -1,2 +1,2 @@
-  export type PanelType = "NotePropsV2" | "schema";
+  export type PanelType = "Notes" | "schema";
   export type PanelMode = "hierarchy";

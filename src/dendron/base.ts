@@ -22,7 +22,7 @@ import { Logger } from "../logger";
 const PANELS: {
   [key in PanelType]: { [key in PanelMode]: undefined | WebviewPanel };
 } = {
-  NotePropsV2: {
+  Notes: {
     hierarchy: undefined,
   },
   schema: {
@@ -33,7 +33,7 @@ const PANELS: {
 const GRAPHS: {
   [key in PanelType]: { [key in PanelMode]: Graph };
 } = {
-  NotePropsV2: {
+  Notes: {
     hierarchy: { nodes: [], edges: [] },
   },
   schema: {

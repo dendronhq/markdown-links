@@ -1,19 +1,18 @@
-import * as vscode from "vscode";
-import { TextDecoder } from "util";
 import * as path from "path";
-import { parseFile, parseDirectory, learnFileId } from "./parsing";
+import { TextDecoder } from "util";
+import * as vscode from "vscode";
+import { setupDendron } from "./dendron/base";
+import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
+import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
+import { Logger } from "./logger";
+import { parseFile } from "./parsing";
+import { Graph } from "./types";
 import {
   filterNonExistingEdges,
   getColumnSetting,
   getConfiguration,
-  getFileTypesSetting,
+  getFileTypesSetting
 } from "./utils";
-import { Graph } from "./types";
-import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
-import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
-import { ReloadGraphCommand } from "./dendron/ReloadGraphCommand";
-import { setupDendron } from "./dendron/base";
-import { Logger } from "./logger";
 
 const watch = (
   context: vscode.ExtensionContext,
@@ -141,11 +140,6 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand(ReloadGraphCommand.id, async () => {
-      await new ReloadGraphCommand().execute(context);
-    })
-  );
   setupDendron(context);
 
 
