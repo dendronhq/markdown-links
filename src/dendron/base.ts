@@ -202,7 +202,7 @@ export abstract class ShowNodeCommand extends BaseCommand {
     return graph;
   }
 
-  abstract async execute(
+  abstract execute(
     context: ExtensionContext,
     opts?: { silent?: boolean }
   ): Promise<void>;
