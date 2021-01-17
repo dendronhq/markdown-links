@@ -1,12 +1,11 @@
-import { BaseCommand, getPanel, sendGraph, ShowNodeCommand, getGraph } from "./base";
-import { ExtensionContext } from "vscode";
-import { getColumnSetting, filterNonExistingEdges } from "../utils";
-import { Graph } from "../types";
-import { NotePropsV2, DEngineClientV2, DNodePropsV2, NoteUtilsV2, DNodeUtilsV2 } from "@dendronhq/common-all";
-import path = require("path");
-import { getWebviewContent } from "../extension";
-import { createWatcher } from "./watcher";
+import { DEngineClientV2, DNodePropsV2, DNodeUtilsV2, NotePropsV2 } from "@dendronhq/common-all";
 import * as _ from 'lodash';
+import { ExtensionContext } from "vscode";
+import { getWebviewContent } from "../extension";
+import { getColumnSetting } from "../utils";
+import { getPanel, sendGraph, ShowNodeCommand } from "./base";
+import { createWatcher } from "./watcher";
+import path = require("path");
 
 export class ShowNotesCommand extends ShowNodeCommand {
   static id: string = "dendron.showNoteGraph";

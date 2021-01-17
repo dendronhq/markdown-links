@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { setupDendron } from "./dendron/base";
 import { ShowNotesCommand } from "./dendron/ShowNotesCommand";
 import { ShowSchemaCommand } from "./dendron/ShowSchemaCommand";
+import { SyncGraphCommand } from "./dendron/SyncGraphCommand";
 import { Logger } from "./logger";
 import { parseFile } from "./parsing";
 import { Graph } from "./types";
@@ -137,6 +138,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(ShowNotesCommand.id, async () => {
       await new ShowNotesCommand().execute(context);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(SyncGraphCommand.id, async () => {
+      await new SyncGraphCommand().execute(context);
     })
   );
 

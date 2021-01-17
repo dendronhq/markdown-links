@@ -56,7 +56,7 @@ export class ShowSchemaCommand extends ShowNodeCommand {
     await Promise.all(
       nodes.map((schemaMod) => {
         const schema = schemaMod.root;
-        return this.parseGraphV2({ schema, schemaMod, graph });
+        return this.parseGraphV2({ schema, schemaMod, graph, wsRoot: engine.wsRoot });
       })
     );
     filterNonExistingEdges(graph);
@@ -72,14 +72,14 @@ export class ShowSchemaCommand extends ShowNodeCommand {
     schema,
     schemaMod,
     graph,
+    wsRoot
   }: {
     schema: SchemaPropsV2;
     schemaMod: SchemaModulePropsV2;
     graph: Graph;
+    wsRoot: string;
   }) {
-    const fname = schemaMod.fname;
-    const root = schemaMod.vault.fsPath;
-    const fullPath = SchemaUtilsV2.getPath({ root, fname });
+    const fullPath = SchemaUtilsV2.getPathV4({ wsRoot, mschema: schemaMod});
     const gNote = {
       id: this.getId(schema),
       path: fullPath,
@@ -92,7 +92,7 @@ export class ShowSchemaCommand extends ShowNodeCommand {
         source: this.getId(schema),
         target: this.getId(child),
       });
-      return this.parseGraphV2({ schema: child, schemaMod, graph });
+      return this.parseGraphV2({ wsRoot, schema: child, schemaMod, graph });
     });
   }
 

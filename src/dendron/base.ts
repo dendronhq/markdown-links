@@ -1,11 +1,11 @@
 import {
   DEngineClientV2,
-  DNodePropsV2,
+
   NotePropsV2,
   NoteUtilsV2,
   SchemaModulePropsV2,
   SchemaPropsV2,
-  SchemaUtilsV2,
+  SchemaUtilsV2
 } from "@dendronhq/common-all";
 // import { DendronEngine } from "@dendronhq/engine-server";
 import { EngineConnector, getWSMetaFilePath } from "@dendronhq/engine-server";
@@ -13,11 +13,11 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as vscode from "vscode";
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from "vscode";
+import { Logger } from "../logger";
 import { Graph } from "../types";
 import { filterNonExistingEdges } from "../utils";
 import { PanelMode, PanelType } from "./types";
 import path = require("path");
-import { Logger } from "../logger";
 
 const PANELS: {
   [key in PanelType]: { [key in PanelMode]: undefined | WebviewPanel };
@@ -103,16 +103,10 @@ export async function setupDendron(context: vscode.ExtensionContext) {
   const fpath = getWSMetaFilePath({ wsRoot });
   Logger.info({ ctx, wsRoot, vaults, metaFile: fpath, msg: "enter" });
   if (fs.existsSync(fpath)) {
-    const connector = new EngineConnector({ wsRoot, vaults });
+    const connector = new EngineConnector({ wsRoot });
     Logger.info({ ctx, msg: "pre:connectorInit" });
-    await connector.init({
-      onReady: async () => {
-        Logger.info({ ctx, msg: "post:connectorInit" });
-        setInterval(async () => {
-          connector.engine.sync();
-        }, 5000);
-      },
-    });
+    await connector.init({});
+    Logger.info({ ctx, msg: "post:connectorInit" });
   }
 }
 
@@ -163,11 +157,12 @@ export abstract class ShowNodeCommand extends BaseCommand {
     graph: Graph
   ): Promise<Graph> {
     const getId = this.getId;
+    const wsRoot = engine.wsRoot;
     while (!_.isEmpty(nodes)) {
       const n = nodes.pop();
       if (this.type === "note") {
         const note = n as NotePropsV2;
-        const fullPath = NoteUtilsV2.getPath({ note });
+        const fullPath = NoteUtilsV2.getPathV4({ note, wsRoot });
         const gNote = {
           id: getId(note),
           path: fullPath,
