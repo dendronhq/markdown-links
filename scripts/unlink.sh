@@ -1,6 +1,6 @@
 #!/bin/bash
-VERSION_COMMON_ALL=0.16.0
-VERSION_ENGINE_SERVER=0.16.1-alpha.1
+VERSION_ENGINE_SERVER=`cat ../dendron/meta.json | jq -r '.["@dendronhq/engine-server"]'`
+VERSION_COMMON_ALL=`cat ../dendron/meta.json | jq -r '.["@dendronhq/common-all"]'`
 
 yarn unlink @dendronhq/common-all
 yarn unlink @dendronhq/engine-server
