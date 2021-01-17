@@ -142,10 +142,17 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(SyncGraphCommand.id, async () => {
-      await new SyncGraphCommand().execute(context);
+    vscode.commands.registerCommand("dendron.syncNoteGraph", async () => {
+      await new ShowNotesCommand().execute(context, {sync: true});
     })
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("dendron.syncSchemaGraph", async () => {
+      await new ShowSchemaCommand().execute(context, {sync: true});
+    })
+  );
+
 
   setupDendron(context);
 

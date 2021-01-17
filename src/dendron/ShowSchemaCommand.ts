@@ -4,9 +4,10 @@ import {
   DNodeUtilsV2,
   SchemaModulePropsV2,
   SchemaPropsV2,
-  SchemaUtilsV2,
+  SchemaUtilsV2
 } from "@dendronhq/common-all";
 import * as _ from "lodash";
+import * as vscode from "vscode";
 import { ExtensionContext } from "vscode";
 import { getWebviewContent } from "../extension";
 import { Graph } from "../types";
@@ -37,10 +38,22 @@ export class ShowSchemaCommand extends ShowNodeCommand {
   getLabel = (n: SchemaPropsV2) => `${n.title || n.id}`;
   getExtension = () => `.yml`;
 
-  async execute(context: ExtensionContext, opts?: { silent?: boolean }) {
+  async execute(context: ExtensionContext, opts?: { silent?: boolean, sync?: boolean }) {
     const engine = await this.getEngine();
     if (!engine) {
       return;
+    }
+    if (opts?.sync) {
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: "Syncing...",
+          cancellable: false,
+        },
+        () => {
+          return engine.sync();
+        }
+      );
     }
     const cleanOpts = _.defaults(opts, { silent: false });
     const column = getColumnSetting("showColumn");

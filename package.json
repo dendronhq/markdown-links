@@ -37,6 +37,14 @@
       {
         "command": "dendron.showNoteGraph",
         "title": "Dendron: Show Note Graph"
+      },
+      {
+        "command": "dendron.syncNoteGraph",
+        "title": "Dendron: Sync Note Graph"
+      },
+      {
+        "command": "dendron.syncSchemaGraph",
+        "title": "Dendron: Sync Schema Graph"
       }
     ],
     "configuration": {
