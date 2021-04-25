@@ -65,7 +65,20 @@ export class ShowNotesCommand extends ShowNodeCommand {
     const graph = { nodes: [], edges: [] };
     const nodes = this.getNodes(engine);
     this.parseGraph(nodes, engine, graph);
-    maybePanel.webview.html = await getWebviewContent(context, maybePanel);
+    maybePanel.webview.html = await (
+      opts?.sync ? getWebviewContent(
+        context, maybePanel
+      ) : vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: "Loading...",
+          cancellable: false,
+        },
+        () => {
+          return getWebviewContent(context, maybePanel);
+        }
+      )
+    );
     if (!cleanOpts.silent) {
       sendGraph(maybePanel, graph);
     }
